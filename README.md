@@ -71,6 +71,7 @@ export default App
 ```
 
 At build time, output to the terminal as follows.
+You can jump to the corresponding code from the path.
 
 ```bash
 /Users/XXXXXX/projects/Sample/src/App.tsx(4) :>>   // [todo]: [2022/05/22] issue #765
