@@ -21,6 +21,17 @@ If a line matching the word has a date set, it is compared to the current date a
 npm i -D vite-plugin-hit-word
 ```
 
+## Options
+
+If `hasLimitDate` is set, compares the current date to the date set on the line where the matched word exists. If the current date is newer, the text on the console is printed in red.
+
+| Parameter         | Type                                        | Description                                       |
+| ----------------- | ------------------------------------------- | ------------------------------------------------- |
+| includes          | string \| RegExp \| Array<string \| RegExp> | Set the target path.                              |
+| exclude           | string \| RegExp \| Array<string \| RegExp> | Set the paths you want to exclude.                |
+| word.value        | string \| RegExp \| Array<string \| RegExp> | Set the words you want to search for on the code. |
+| word.hasLimitDate | boolean                                     | Check with the current date.(default false)       |
+
 ## Add it to vite.config.ts
 
 ```ts
@@ -33,22 +44,37 @@ export default defineConfig({
     hitWord({
       include: ['src/*'],
       exclude: ['node_modules'],
-      word: { value: ['todo'], hasLimitDate: true },
+      word: { value: ['[todo]:'], hasLimitDate: true },
     }),
   ],
 })
 ```
 
-## Options
+#### e.g.
 
-If `hasLimitDate` is set, compares the current date to the date set on the line where the matched word exists. If the current date is newer, the text on the console is printed in red.
+The following files are available.
 
-| Parameter         | Type                                        | Description                                       |
-| ----------------- | ------------------------------------------- | ------------------------------------------------- |
-| includes          | string \| RegExp \| Array<string \| RegExp> | Set the target path.                              |
-| exclude           | string \| RegExp \| Array<string \| RegExp> | Set the paths you want to exclude.                |
-| word.value        | string \| RegExp \| Array<string \| RegExp> | Set the words you want to search for on the code. |
-| word.hasLimitDate | boolean                                     | Check with the current date.(default false)       |
+```tsx
+import styles from './App.module.css'
+
+function App() {
+  // [todo]: [2022/05/22] issue #765
+
+  return (
+    <div className="App">
+      <header className={styles.header}></header>
+    </div>
+  )
+}
+
+export default App
+```
+
+At build time, output to the terminal as follows.
+
+```bash
+/Users/XXXXXX/projects/Sample/src/App.tsx(4) :>>   // [todo]: [2022/05/22] issue #765
+```
 
 ## Principles of conduct
 
