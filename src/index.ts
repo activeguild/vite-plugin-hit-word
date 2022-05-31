@@ -6,7 +6,7 @@ import type { PluginOption } from 'vite'
 export declare interface Options {
   include?: string | RegExp | Array<string | RegExp>
   exclude?: string | RegExp | Array<string | RegExp>
-  word: Word<string> | Word<RegExp> | Array<Word<string | RegExp>>
+  word: Word<string | RegExp> | Array<Word<string | RegExp>>
 }
 
 type Word<T> = {
@@ -15,11 +15,9 @@ type Word<T> = {
 }
 
 const resolveWord = (
-  word?: Word<string> | Word<RegExp> | Array<Word<string | RegExp>>
+  word: Word<string | RegExp> | Array<Word<string | RegExp>>
 ): Array<Word<string | RegExp>> => {
-  if (!word) {
-    return []
-  } else if (Array.isArray(word)) {
+  if (Array.isArray(word)) {
     return word
   } else {
     return [word]
@@ -27,7 +25,7 @@ const resolveWord = (
 }
 
 export default function vitePluginHitWord(
-  opts: Options = { word: { value: 'todo' } }
+  opts: Options = { word: { value: 'todo:' } }
 ): PluginOption {
   const filter = createFilter(opts.include, opts.exclude)
   const word = resolveWord(opts.word)
@@ -37,12 +35,12 @@ export default function vitePluginHitWord(
     name: 'vite-plugin-hit-word',
     load(id) {
       if (word.length > 0 && filter(id)) {
-        const idWithoutUsed = id
+        const idWithoutPrefix = id
           .replace('?used', '')
           .replace('?worker', '')
           .replace('.ts_file', '.ts')
 
-        const buffer = fs.readFileSync(idWithoutUsed)
+        const buffer = fs.readFileSync(idWithoutPrefix)
         const fileText = buffer.toString()
         const splittedFileText = fileText.split('\n')
         let index = 0
@@ -58,27 +56,29 @@ export default function vitePluginHitWord(
               matched = _word.value.test(text)
             }
 
-            if (matched) {
-              let limited = false
-              if (_word.hasLimitDate) {
-                const matchedTexts = text.match(/(?<=[[({])[^\][]*(?=[\]})])/g)
-                if (matchedTexts) {
-                  for (const matchedText of matchedTexts) {
-                    const date = new Date(matchedText)
-                    if (Date.now() >= date.getTime()) {
-                      limited = true
-                      break
-                    }
+            if (!matched) {
+              continue
+            }
+
+            let limited = false
+            if (_word.hasLimitDate) {
+              const matchedTexts = text.match(/(?<=[[({])[^\][]*(?=[\]})])/g)
+              if (matchedTexts) {
+                for (const matchedText of matchedTexts) {
+                  const date = new Date(matchedText)
+                  if (Date.now() >= date.getTime()) {
+                    limited = true
+                    break
                   }
                 }
               }
+            }
 
-              const formattedLog = `${idWithoutUsed}(${index + 1}) :>> ${text}`
-              if (limited) {
-                logs.push(pc.red(formattedLog))
-              } else {
-                logs.push(pc.yellow(formattedLog))
-              }
+            const formattedLog = `${idWithoutPrefix}(${index + 1}) :>> ${text}`
+            if (limited) {
+              logs.push(pc.red(formattedLog))
+            } else {
+              logs.push(pc.yellow(formattedLog))
             }
           }
 
