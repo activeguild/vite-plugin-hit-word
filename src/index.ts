@@ -60,11 +60,11 @@ export default function vitePluginHitWord(opts: Options = {}): PluginOption {
               if (opts.word?.hasLimitDate) {
                 const matchedTexts = text.match(/(?<=[[({])[^\][]*(?=[\]})])/g)
                 if (matchedTexts) {
-                  loop1: for (const matchedText of matchedTexts) {
+                  for (const matchedText of matchedTexts) {
                     const date = new Date(matchedText)
                     if (Date.now() >= date.getTime()) {
                       limited = true
-                      break loop1
+                      break
                     }
                   }
                 }
@@ -87,6 +87,7 @@ export default function vitePluginHitWord(opts: Options = {}): PluginOption {
     },
     buildEnd() {
       if (logs.length > 0) {
+        console.log('\n')
         for (const log of logs) {
           console.log(log)
         }
