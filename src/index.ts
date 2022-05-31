@@ -87,6 +87,7 @@ export default function vitePluginHitWord(opts: Options = {}): PluginOption {
     },
     buildEnd() {
       if (logs.length > 0) {
+        console.log('\n')
         for (const log of logs) {
           console.log(log)
         }
