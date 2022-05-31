@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-hit-word",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Lists files containing the specified word(s).",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
