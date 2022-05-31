@@ -6,7 +6,7 @@ import type { PluginOption } from 'vite'
 export declare interface Options {
   include?: string | RegExp | Array<string | RegExp>
   exclude?: string | RegExp | Array<string | RegExp>
-  word?: Word<string | RegExp | Array<string | RegExp>>
+  word: Word<string> | Word<RegExp> | Array<Word<string | RegExp>>
 }
 
 type Word<T> = {
@@ -15,19 +15,22 @@ type Word<T> = {
 }
 
 const resolveWord = (
-  value?: string | RegExp | Array<string | RegExp>
-): Array<string | RegExp> => {
-  if (!value) {
+  word?: Word<string> | Word<RegExp> | Array<Word<string | RegExp>>
+): Array<Word<string | RegExp>> => {
+  if (!word) {
     return []
-  } else if (typeof value === 'string' || value instanceof RegExp) {
-    return [value]
+  } else if (Array.isArray(word)) {
+    return word
+  } else {
+    return [word]
   }
-  return value
 }
 
-export default function vitePluginHitWord(opts: Options = {}): PluginOption {
+export default function vitePluginHitWord(
+  opts: Options = { word: { value: 'todo' } }
+): PluginOption {
   const filter = createFilter(opts.include, opts.exclude)
-  const word = resolveWord(opts.word?.value)
+  const word = resolveWord(opts.word)
   const logs: string[] = []
 
   return {
@@ -49,15 +52,15 @@ export default function vitePluginHitWord(opts: Options = {}): PluginOption {
 
           for (const _word of word) {
             let matched = false
-            if (typeof _word === 'string') {
-              matched = text.includes(_word)
+            if (typeof _word.value === 'string') {
+              matched = text.includes(_word.value)
             } else {
-              matched = _word.test(text)
+              matched = _word.value.test(text)
             }
 
             if (matched) {
               let limited = false
-              if (opts.word?.hasLimitDate) {
+              if (_word.hasLimitDate) {
                 const matchedTexts = text.match(/(?<=[[({])[^\][]*(?=[\]})])/g)
                 if (matchedTexts) {
                   for (const matchedText of matchedTexts) {
