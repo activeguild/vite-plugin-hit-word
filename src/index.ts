@@ -12,11 +12,11 @@ type ReplacementFunc = (word: string | RegExp, fileText: string) => string
 
 type Word<T> = {
   value: T
-  hasLimitDate?: boolean
+  hasDeadlineDate?: boolean
   replacement?: ReplacementFunc | string
 }
 
-const resolveWord = (
+const resolveWordOption = (
   word: Word<string | RegExp> | Array<Word<string | RegExp>>
 ): Array<Word<string | RegExp>> => {
   if (Array.isArray(word)) {
@@ -30,17 +30,14 @@ export default function vitePluginHitWord(
   opts: Options = { word: { value: 'todo:' } }
 ): PluginOption {
   const filter = createFilter(opts.include, opts.exclude)
-  const word = resolveWord(opts.word)
+  const words = resolveWordOption(opts.word)
   const logs: string[] = []
 
   return {
     name: 'vite-plugin-hit-word',
     load(id) {
-      if (word.length > 0 && filter(id)) {
-        const idWithoutPrefix = id
-          .replace('?used', '')
-          .replace('?worker', '')
-          .replace('.ts_file', '.ts')
+      if (words.length > 0 && filter(id)) {
+        const idWithoutPrefix = id.replace('.ts_file', '.ts').split('?')[0]
 
         const buffer = fs.readFileSync(idWithoutPrefix)
         let fileText = buffer.toString()
@@ -50,35 +47,13 @@ export default function vitePluginHitWord(
         while (index < splittedFileText.length) {
           const text = splittedFileText[index]
 
-          for (const _word of word) {
-            let matched = false
-
-            if (typeof _word.value === 'string') {
-              matched = text.includes(_word.value)
-            } else {
-              matched = _word.value.test(text)
-            }
-
-            if (!matched) {
+          for (const word of words) {
+            if (!isMatched(text, word)) {
               continue
             }
 
-            let limited = false
-            if (_word.hasLimitDate) {
-              const matchedTexts = text.match(/(?<=[[({])[^\][]*(?=[\]})])/g)
-              if (matchedTexts) {
-                for (const matchedText of matchedTexts) {
-                  const date = new Date(matchedText)
-                  if (Date.now() >= date.getTime()) {
-                    limited = true
-                    break
-                  }
-                }
-              }
-            }
-
-            const formattedLog = `${idWithoutPrefix}(${index + 1}) :>> ${text}`
-            if (limited) {
+            const formattedLog = `${idWithoutPrefix}(${index + 1}) : ${text}`
+            if (IsDeadlineExceeded(text, word)) {
               logs.push(pc.red(formattedLog))
             } else {
               logs.push(pc.yellow(formattedLog))
@@ -88,15 +63,15 @@ export default function vitePluginHitWord(
           index++
         }
 
-        for (const _word of word) {
-          if (!_word.replacement) {
+        for (const word of words) {
+          if (!word.replacement) {
             continue
           }
 
-          if (typeof _word.replacement === 'function') {
-            fileText = _word.replacement(_word.value, fileText)
+          if (typeof word.replacement === 'function') {
+            fileText = word.replacement(word.value, fileText)
           } else {
-            fileText = fileText.replace(_word.value, _word.replacement)
+            fileText = fileText.replace(word.value, word.replacement)
           }
         }
 
@@ -112,4 +87,32 @@ export default function vitePluginHitWord(
       }
     },
   }
+}
+
+function isMatched(text: string, word: Word<string | RegExp>): boolean {
+  if (typeof word.value === 'string') {
+    return text.includes(word.value)
+  } else {
+    return word.value.test(text)
+  }
+}
+
+function IsDeadlineExceeded(
+  text: string,
+  word: Word<string | RegExp>
+): boolean {
+  if (!word.hasDeadlineDate) {
+    return false
+  }
+  const matchedTexts = text.match(/(?<=[[({])[^\][]*(?=[\]})])/g)
+  if (matchedTexts) {
+    for (const matchedText of matchedTexts) {
+      const date = new Date(matchedText)
+      if (Date.now() >= date.getTime()) {
+        return true
+      }
+    }
+  }
+
+  return false
 }
