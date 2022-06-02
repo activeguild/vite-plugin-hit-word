@@ -8,10 +8,12 @@ export declare interface Options {
   exclude?: string | RegExp | Array<string | RegExp>
   word: Word<string | RegExp> | Array<Word<string | RegExp>>
 }
+type ReplacementFunc = (word: string | RegExp, fileText: string) => string
 
 type Word<T> = {
   value: T
   hasLimitDate?: boolean
+  replacement?: ReplacementFunc | string
 }
 
 const resolveWord = (
@@ -41,7 +43,7 @@ export default function vitePluginHitWord(
           .replace('.ts_file', '.ts')
 
         const buffer = fs.readFileSync(idWithoutPrefix)
-        const fileText = buffer.toString()
+        let fileText = buffer.toString()
         const splittedFileText = fileText.split('\n')
         let index = 0
 
@@ -50,6 +52,7 @@ export default function vitePluginHitWord(
 
           for (const _word of word) {
             let matched = false
+
             if (typeof _word.value === 'string') {
               matched = text.includes(_word.value)
             } else {
@@ -83,6 +86,18 @@ export default function vitePluginHitWord(
           }
 
           index++
+        }
+
+        for (const _word of word) {
+          if (!_word.replacement) {
+            continue
+          }
+
+          if (typeof _word.replacement === 'function') {
+            fileText = _word.replacement(_word.value, fileText)
+          } else {
+            fileText = fileText.replace(_word.value, _word.replacement)
+          }
         }
 
         return fileText
