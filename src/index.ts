@@ -10,7 +10,7 @@ export declare interface Options {
 }
 type ReplacementFunc = (word: string | RegExp, fileText: string) => string
 
-type Word<T> = {
+type Word<T extends string | RegExp> = {
   value: T
   hasDeadlineDate?: boolean
   thrownDealineExceeded?: boolean
