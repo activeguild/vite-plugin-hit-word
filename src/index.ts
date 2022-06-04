@@ -13,6 +13,7 @@ type ReplacementFunc = (word: string | RegExp, fileText: string) => string
 type Word<T> = {
   value: T
   hasDeadlineDate?: boolean
+  thrownDealineExceeded?: boolean
   replacement?: ReplacementFunc | string
 }
 
@@ -54,7 +55,12 @@ export default function vitePluginHitWord(
 
             const formattedLog = `${idWithoutPrefix}(${index + 1}) : ${text}`
             if (IsDeadlineExceeded(text, word)) {
-              logs.push(pc.red(formattedLog))
+              if (word.thrownDealineExceeded) {
+                console.log('pc.red(formattedLog) :>> ', pc.red(formattedLog))
+                throw new Error('The set date has been exceeded.')
+              } else {
+                logs.push(pc.red(formattedLog))
+              }
             } else {
               logs.push(pc.yellow(formattedLog))
             }
