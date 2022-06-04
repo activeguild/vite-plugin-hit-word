@@ -12,10 +12,11 @@ type ReplacementFunc = (word: string | RegExp, fileText: string) => string
 
 type Word<T extends string | RegExp> = {
   value: T
+} & Partial<{
   hasDeadlineDate?: boolean
   thrownDealineExceeded?: boolean
   replacement?: ReplacementFunc | string
-}
+}>
 
 const resolveWordOption = (
   word: Word<string | RegExp> | Array<Word<string | RegExp>>
