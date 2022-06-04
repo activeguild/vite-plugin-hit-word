@@ -25,13 +25,14 @@ npm i -D vite-plugin-hit-word
 
 If `hasLimitDate` is set, compares the current date to the date set on the line where the matched word exists. If the current date is newer, the text on the console is printed in red.
 
-| Parameter         | Type                                                          | Description                                       |
-| ----------------- | ------------------------------------------------------------- | ------------------------------------------------- |
-| includes          | string \| RegExp \| Array<string \| RegExp>                   | Set the target path.                              |
-| exclude           | string \| RegExp \| Array<string \| RegExp>                   | Set the paths you want to exclude.                |
-| word.value        | string \| RegExp \| Array<string \| RegExp>                   | Set the words you want to search for on the code. |
-| word.hasLimitDate | boolean                                                       | Check with the current date.(default false)       |
-| word.replacement  | string \|(word: string \| RegExp, fileText: string) => string | Replace matched words.                            |
+| Parameter                  | Type                                                          | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| includes                   | string \| RegExp \| Array<string \| RegExp>                   | Set the target path.                                          |
+| exclude                    | string \| RegExp \| Array<string \| RegExp>                   | Set the paths you want to exclude.                            |
+| word.value                 | string \| RegExp \| Array<string \| RegExp>                   | Set the words you want to search for on the code.             |
+| word.hasLimitDate          | boolean                                                       | Check with the current date.(default false)                   |
+| word.thrownDealineExceeded | boolean                                                       | Throws an exceedance and terminates the build.(default false) |
+| word.replacement           | string \|(word: string \| RegExp, fileText: string) => string | Replace matched words.                                        |
 
 ## Add it to vite.config.ts
 
