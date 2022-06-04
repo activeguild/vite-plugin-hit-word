@@ -6,11 +6,11 @@ import type { PluginOption } from 'vite'
 export declare interface Options {
   include?: string | RegExp | Array<string | RegExp>
   exclude?: string | RegExp | Array<string | RegExp>
-  word: Word<string | RegExp> | Array<Word<string | RegExp>>
+  word: Word<WordValue> | Array<Word<WordValue>>
 }
 type ReplacementFunc = (word: string | RegExp, fileText: string) => string
-
-type Word<T extends string | RegExp> = {
+type WordValue = string | RegExp
+type Word<T extends WordValue> = {
   value: T
 } & Partial<{
   hasDeadlineDate: boolean
@@ -19,8 +19,8 @@ type Word<T extends string | RegExp> = {
 }>
 
 const resolveWordOption = (
-  word: Word<string | RegExp> | Array<Word<string | RegExp>>
-): Array<Word<string | RegExp>> => {
+  word: Word<WordValue> | Array<Word<WordValue>>
+): Array<Word<WordValue>> => {
   if (Array.isArray(word)) {
     return word
   } else {
@@ -104,10 +104,7 @@ function isMatched(text: string, word: Word<string | RegExp>): boolean {
   }
 }
 
-function IsDeadlineExceeded(
-  text: string,
-  word: Word<string | RegExp>
-): boolean {
+function IsDeadlineExceeded(text: string, word: Word<WordValue>): boolean {
   if (!word.hasDeadlineDate) {
     return false
   }
