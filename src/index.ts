@@ -1,5 +1,5 @@
 import { createFilter } from '@rollup/pluginutils'
-import * as fs from 'fs'
+import { promises as fsp } from 'fs'
 import * as pc from 'picocolors'
 import type { Colors } from 'picocolors/types'
 import type { PluginOption } from 'vite'
@@ -52,11 +52,11 @@ export default function vitePluginHitWord(
 
   return {
     name: 'vite-plugin-hit-word',
-    load(id) {
+    async load(id) {
       if (words.length > 0 && filter(id)) {
         const idWithoutPrefix = id.replace('.ts_file', '.ts').split('?')[0]
 
-        const buffer = fs.readFileSync(idWithoutPrefix)
+        const buffer = await fsp.readFile(idWithoutPrefix)
         let fileText = buffer.toString()
         const splittedFileText = fileText.split('\n')
         let index = 0
