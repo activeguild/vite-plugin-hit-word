@@ -70,7 +70,7 @@ export default function vitePluginHitWord(
             const formattedLog = `${idWithoutPrefix}(${index + 1}) : ${text}`
             if (IsDeadlineExceeded(text, word)) {
               if (word.thrownDeadlineExceeded) {
-                console.log('pc.red(formattedLog) :>> ', pc.red(formattedLog))
+                console.log(pc.red(formattedLog))
                 throw new Error('The set date has been exceeded.')
               } else {
                 logs.push(pc.red(formattedLog))
