@@ -1,6 +1,7 @@
 import { createFilter } from '@rollup/pluginutils'
 import * as fs from 'fs'
 import * as pc from 'picocolors'
+import type { Colors } from 'picocolors/types'
 import type { PluginOption } from 'vite'
 
 export declare interface Options {
@@ -13,6 +14,18 @@ type WordValue = string | RegExp
 type Word<T extends WordValue> = {
   value: T
 } & Partial<{
+  logFontColor: keyof Pick<
+    Colors,
+    | 'black'
+    | 'red'
+    | 'green'
+    | 'yellow'
+    | 'blue'
+    | 'magenta'
+    | 'cyan'
+    | 'white'
+    | 'gray'
+  >
   hasDeadlineDate: boolean
   thrownDealineExceeded: boolean
   replacement: ReplacementFunc | string
@@ -63,7 +76,7 @@ export default function vitePluginHitWord(
                 logs.push(pc.red(formattedLog))
               }
             } else {
-              logs.push(pc.yellow(formattedLog))
+              logs.push(pc[word.logFontColor || 'yellow'](formattedLog))
             }
           }
 
