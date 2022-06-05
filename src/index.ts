@@ -11,23 +11,25 @@ export declare interface Options {
 }
 type ReplacementFunc = (word: string | RegExp, fileText: string) => string
 type WordValue = string | RegExp
+type FontColor = keyof Pick<
+  Colors,
+  | 'black'
+  | 'red'
+  | 'green'
+  | 'yellow'
+  | 'blue'
+  | 'magenta'
+  | 'cyan'
+  | 'white'
+  | 'gray'
+>
 type Word<T extends WordValue> = {
   value: T
 } & Partial<{
-  logFontColor: keyof Pick<
-    Colors,
-    | 'black'
-    | 'red'
-    | 'green'
-    | 'yellow'
-    | 'blue'
-    | 'magenta'
-    | 'cyan'
-    | 'white'
-    | 'gray'
-  >
+  logFontColor: FontColor
   hasDeadlineDate: boolean
   thrownDeadlineExceeded: boolean
+  deadlineExceededFonrColor: FontColor
   replacement: ReplacementFunc | string
 }>
 
@@ -69,11 +71,12 @@ export default function vitePluginHitWord(
 
             const formattedLog = `${idWithoutPrefix}(${index + 1}) : ${text}`
             if (IsDeadlineExceeded(text, word)) {
+              const func = pc[word.deadlineExceededFonrColor || 'red']
               if (word.thrownDeadlineExceeded) {
-                console.log(pc.red(formattedLog))
+                console.log(func(formattedLog))
                 throw new Error('The set date has been exceeded.')
               } else {
-                logs.push(pc.red(formattedLog))
+                logs.push(func(formattedLog))
               }
             } else {
               logs.push(pc[word.logFontColor || 'yellow'](formattedLog))
