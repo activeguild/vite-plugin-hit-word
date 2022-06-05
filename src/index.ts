@@ -27,7 +27,7 @@ type Word<T extends WordValue> = {
     | 'gray'
   >
   hasDeadlineDate: boolean
-  thrownDealineExceeded: boolean
+  thrownDeadlineExceeded: boolean
   replacement: ReplacementFunc | string
 }>
 
@@ -69,7 +69,7 @@ export default function vitePluginHitWord(
 
             const formattedLog = `${idWithoutPrefix}(${index + 1}) : ${text}`
             if (IsDeadlineExceeded(text, word)) {
-              if (word.thrownDealineExceeded) {
+              if (word.thrownDeadlineExceeded) {
                 console.log('pc.red(formattedLog) :>> ', pc.red(formattedLog))
                 throw new Error('The set date has been exceeded.')
               } else {
