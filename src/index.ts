@@ -1,6 +1,7 @@
 import { createFilter } from '@rollup/pluginutils'
-import * as fs from 'fs'
+import { promises as fsp } from 'fs'
 import * as pc from 'picocolors'
+import type { Colors } from 'picocolors/types'
 import type { PluginOption } from 'vite'
 
 export declare interface Options {
@@ -10,11 +11,25 @@ export declare interface Options {
 }
 type ReplacementFunc = (word: string | RegExp, fileText: string) => string
 type WordValue = string | RegExp
+type FontColor = keyof Pick<
+  Colors,
+  | 'black'
+  | 'red'
+  | 'green'
+  | 'yellow'
+  | 'blue'
+  | 'magenta'
+  | 'cyan'
+  | 'white'
+  | 'gray'
+>
 type Word<T extends WordValue> = {
   value: T
 } & Partial<{
+  logFontColor: FontColor
   hasDeadlineDate: boolean
-  thrownDealineExceeded: boolean
+  thrownDeadlineExceeded: boolean
+  deadlineExceededFonrColor: FontColor
   replacement: ReplacementFunc | string
 }>
 
@@ -37,11 +52,11 @@ export default function vitePluginHitWord(
 
   return {
     name: 'vite-plugin-hit-word',
-    load(id) {
+    async load(id) {
       if (words.length > 0 && filter(id)) {
         const idWithoutPrefix = id.replace('.ts_file', '.ts').split('?')[0]
 
-        const buffer = fs.readFileSync(idWithoutPrefix)
+        const buffer = await fsp.readFile(idWithoutPrefix)
         let fileText = buffer.toString()
         const splittedFileText = fileText.split('\n')
         let index = 0
@@ -56,14 +71,15 @@ export default function vitePluginHitWord(
 
             const formattedLog = `${idWithoutPrefix}(${index + 1}) : ${text}`
             if (IsDeadlineExceeded(text, word)) {
-              if (word.thrownDealineExceeded) {
-                console.log('pc.red(formattedLog) :>> ', pc.red(formattedLog))
+              const func = pc[word.deadlineExceededFonrColor || 'red']
+              if (word.thrownDeadlineExceeded) {
+                console.log(func(formattedLog))
                 throw new Error('The set date has been exceeded.')
               } else {
-                logs.push(pc.red(formattedLog))
+                logs.push(func(formattedLog))
               }
             } else {
-              logs.push(pc.yellow(formattedLog))
+              logs.push(pc[word.logFontColor || 'yellow'](formattedLog))
             }
           }
 

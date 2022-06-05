@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-hit-word",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Lists files containing the specified word(s).Say goodbye to the disappointment of todo on the code.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -35,7 +35,7 @@
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
     "esbuild": "^0.14.42",
-    "esbuild-register": "^3.3.2",
+    "esbuild-register": "^3.3.3",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.1",
