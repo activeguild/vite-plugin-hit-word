@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-hit-word",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Lists files containing the specified word(s).Say goodbye to the disappointment of todo on the code.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -54,5 +54,8 @@
   "dependencies": {
     "@rollup/pluginutils": "^4.2.1",
     "picocolors": "^1.0.0"
+  },
+  "volta": {
+    "node": "16.15.1"
   }
 }
