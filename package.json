@@ -54,5 +54,8 @@
   "dependencies": {
     "@rollup/pluginutils": "^4.2.1",
     "picocolors": "^1.0.0"
+  },
+  "volta": {
+    "node": "16.15.1"
   }
 }
